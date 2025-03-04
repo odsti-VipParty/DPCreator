@@ -6,94 +6,86 @@
     <title>VIP DP Generator</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
             text-align: center;
-            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
         }
-        h1 {
-            color: #333;
-        }
-        .container {
-            margin-top: 20px;
-        }
-        input {
-            margin-bottom: 20px;
-        }
-        #canvas {
+        canvas {
             display: block;
             margin: 20px auto;
             border-radius: 50%;
-            border: 5px solid #ffd700;
         }
-        button {
-            background-color: #28a745;
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            cursor: pointer;
-            font-size: 16px;
-            border-radius: 5px;
+        .container {
+            position: relative;
+            width: 300px;
+            margin: auto;
         }
-        button:hover {
-            background-color: #218838;
+        input {
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
 
-    <h1>VIP DP Generator</h1>
-    
+    <h2>VIP DP Generator</h2>
+    <input type="file" id="upload" accept="image/*">
+    <br>
+    <button onclick="downloadDP()">Download DP</button>
+
     <div class="container">
-        <input type="file" id="upload" accept="image/*">
-        <br>
-        <canvas id="canvas" width="300" height="300"></canvas>
-        <br>
-        <button id="download">Download DP</button>
+        <canvas id="dpCanvas" width="300" height="300"></canvas>
     </div>
 
     <script>
-        const upload = document.getElementById("upload");
-        const canvas = document.getElementById("canvas");
+        let uploadedImage = null;
+        const frameURL = "YOUR_FRAME_IMAGE_URL_HERE"; // Replace this with the correct frame image URL
+
+        const canvas = document.getElementById("dpCanvas");
         const ctx = canvas.getContext("2d");
-        const downloadBtn = document.getElementById("download");
 
-        const frame = new Image();
-        frame.src = "https://drive.google.com/uc?export=download&id=1hKFPLBpRKJsi0MM4u6SbdyBk6oPJJVpS"; // Replace with your actual frame URL
-
-        upload.addEventListener("change", function (event) {
+        document.getElementById("upload").addEventListener("change", function(event) {
             const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    const img = new Image();
-                    img.onload = function () {
-                        // Clear previous image
-                        ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (!file) return;
 
-                        // Draw user image inside a circle
-                        ctx.save();
-                        ctx.beginPath();
-                        ctx.arc(150, 150, 140, 0, Math.PI * 2);
-                        ctx.closePath();
-                        ctx.clip();
-                        ctx.drawImage(img, 0, 0, 300, 300);
-                        ctx.restore();
-
-                        // Draw frame on top
-                        ctx.drawImage(frame, 0, 0, 300, 300);
-                    };
-                    img.src = e.target.result;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    uploadedImage = img;
+                    drawDP();
                 };
-                reader.readAsDataURL(file);
-            }
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
         });
 
-        downloadBtn.addEventListener("click", function () {
+        function drawDP() {
+            if (!uploadedImage) return;
+            
+            const frame = new Image();
+            frame.src = frameURL;
+            frame.onload = function() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // Draw user image
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(150, 150, 140, 0, Math.PI * 2);
+                ctx.closePath();
+                ctx.clip();
+                ctx.drawImage(uploadedImage, 30, 30, 240, 240);
+                ctx.restore();
+
+                // Draw frame
+                ctx.drawImage(frame, 0, 0, 300, 300);
+            };
+        }
+
+        function downloadDP() {
             const link = document.createElement("a");
-            link.download = "VIP_DP.png";
+            link.download = "VIP-DP.png";
             link.href = canvas.toDataURL("image/png");
             link.click();
-        });
+        }
     </script>
 
 </body>

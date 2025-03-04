@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIP DP Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f8f9fa;
+        }
+        h1 {
+            color: #333;
+        }
+        .container {
+            margin-top: 20px;
+        }
+        input {
+            margin-bottom: 20px;
+        }
+        #canvas {
+            display: block;
+            margin: 20px auto;
+            border-radius: 50%;
+            border: 5px solid #ffd700;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>VIP DP Generator</h1>
+    
+    <div class="container">
+        <input type="file" id="upload" accept="image/*">
+        <br>
+        <canvas id="canvas" width="300" height="300"></canvas>
+        <br>
+        <button id="download">Download DP</button>
+    </div>
+
+    <script>
+        const upload = document.getElementById("upload");
+        const canvas = document.getElementById("canvas");
+        const ctx = canvas.getContext("2d");
+        const downloadBtn = document.getElementById("download");
+
+        const frame = new Image();
+        frame.src = "https://drive.google.com/uc?export=download&id=1hKFPLBpRKJsi0MM4u6SbdyBk6oPJJVpS"; // Replace with your actual frame URL
+
+        upload.addEventListener("change", function (event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const img = new Image();
+                    img.onload = function () {
+                        // Clear previous image
+                        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                        // Draw user image inside a circle
+                        ctx.save();
+                        ctx.beginPath();
+                        ctx.arc(150, 150, 140, 0, Math.PI * 2);
+                        ctx.closePath();
+                        ctx.clip();
+                        ctx.drawImage(img, 0, 0, 300, 300);
+                        ctx.restore();
+
+                        // Draw frame on top
+                        ctx.drawImage(frame, 0, 0, 300, 300);
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        downloadBtn.addEventListener("click", function () {
+            const link = document.createElement("a");
+            link.download = "VIP_DP.png";
+            link.href = canvas.toDataURL("image/png");
+            link.click();
+        });
+    </script>
+
+</body>
+</html>

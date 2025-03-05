@@ -14,7 +14,7 @@
             margin-top: 20px;
         }
         canvas {
-            border-radius: 20px;
+            border-radius: 10px;
             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
             background: white;
             cursor: grab;
@@ -62,7 +62,7 @@
         let userImage = new Image();
         let imageLoaded = false, frameLoaded = false;
         
-        let imgX = 70, imgY = 70;  // Initial position
+        let imgX = 170, imgY = 170;  // Adjusted initial position
         let scale = 1; // Initial zoom
         let dragging = false;
         let startX, startY;
@@ -93,23 +93,24 @@
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Draw circular user image (inside the frame)
-            const imgSize = 360 * scale;
+            // Circular user image (matching the frame)
             const centerX = canvas.width / 2;
             const centerY = canvas.height / 2;
+            const circleRadius = 160;  // Adjusted to match frame's cutout
 
             ctx.save();
             ctx.beginPath();
-            ctx.arc(centerX, centerY, 180, 0, Math.PI * 2);
+            ctx.arc(centerX, centerY, circleRadius, 0, Math.PI * 2);
             ctx.closePath();
             ctx.clip();
+
+            const imgSize = 2 * circleRadius * scale; // Adjusted size
             ctx.drawImage(userImage, imgX, imgY, imgSize, imgSize);
             ctx.restore();
 
             // Draw frame on top
             ctx.drawImage(frame, 0, 0, canvas.width, canvas.height);
 
-            // Enable download button
             document.getElementById("downloadBtn").disabled = false;
         }
 

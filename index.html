@@ -3,87 +3,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VIP DP Generator</title>
+    <title>विकासशील इंसान पार्टी - DP Generator</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             text-align: center;
-            margin: 20px;
+            background-color: #f8f9fa;
+        }
+        .container {
+            margin-top: 20px;
         }
         canvas {
-            display: block;
-            margin: 20px auto;
             border-radius: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            background: white;
         }
-        input {
+        input, button {
             margin: 10px;
-            padding: 10px;
         }
-        button {
-            padding: 10px 20px;
-            background-color: #28a745;
+        .download-btn {
+            background-color: green;
             color: white;
             border: none;
+            padding: 10px 20px;
             cursor: pointer;
-            font-size: 16px;
             border-radius: 5px;
-        }
-        button:hover {
-            background-color: #218838;
+            font-size: 16px;
         }
     </style>
 </head>
 <body>
-    <h2>VIP DP Generator</h2>
-    <input type="file" id="uploadImage" accept="image/*">
-    <canvas id="canvas" width="500" height="500"></canvas>
-    <button onclick="downloadDP()">Download DP</button>
+
+    <h2>विकासशील इंसान पार्टी - DP Generator</h2>
+    <div class="container">
+        <input type="file" id="imageUpload" accept="image/*">
+        <br>
+        <canvas id="dpCanvas" width="500" height="500"></canvas>
+        <br>
+        <button class="download-btn" id="downloadBtn">Download DP</button>
+    </div>
 
     <script>
-        const canvas = document.getElementById("canvas");
+        const canvas = document.getElementById("dpCanvas");
         const ctx = canvas.getContext("2d");
-        const frameURL = "https://raw.githubusercontent.com/odsti-VipParty/DPCreator/main/DP.png"; // Change if needed
-        let userImage = null;
 
-        document.getElementById("uploadImage").addEventListener("change", function(event) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                userImage = new Image();
-                userImage.onload = function() {
-                    drawDP();
+        const frame = new Image();
+        frame.crossOrigin = "anonymous";  // Prevent CORS issues
+        frame.src = "https://raw.githubusercontent.com/odsti-VipParty/DPCreator/main/DP.png";
+
+        let userImage = new Image();
+
+        document.getElementById("imageUpload").addEventListener("change", function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    userImage.src = e.target.result;
                 };
-                userImage.src = e.target.result;
-            };
-            reader.readAsDataURL(event.target.files[0]);
+                reader.readAsDataURL(file);
+            }
         });
 
-        function drawDP() {
+        userImage.onload = function() {
+            drawCanvas();
+        };
+
+        frame.onload = function() {
+            drawCanvas();
+        };
+
+        function drawCanvas() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            if (userImage) {
+            // Draw circular user image
+            if (userImage.src) {
+                const imgSize = 360;  // Adjust for better fit
+                const imgX = (canvas.width - imgSize) / 2;
+                const imgY = (canvas.height - imgSize) / 2;
+                
                 ctx.save();
                 ctx.beginPath();
-                ctx.arc(250, 250, 200, 0, Math.PI * 2, true);
+                ctx.arc(canvas.width / 2, canvas.height / 2, imgSize / 2, 0, Math.PI * 2);
                 ctx.closePath();
                 ctx.clip();
-                ctx.drawImage(userImage, 50, 50, 400, 400);
+                ctx.drawImage(userImage, imgX, imgY, imgSize, imgSize);
                 ctx.restore();
             }
 
-            const frame = new Image();
-            frame.onload = function() {
-                ctx.drawImage(frame, 0, 0, 500, 500);
-            };
-            frame.src = frameURL;
+            // Draw frame on top
+            ctx.drawImage(frame, 0, 0, canvas.width, canvas.height);
         }
 
-        function downloadDP() {
+        document.getElementById("downloadBtn").addEventListener("click", function() {
             const link = document.createElement("a");
             link.download = "VIP_DP.png";
             link.href = canvas.toDataURL("image/png");
             link.click();
-        }
+        });
     </script>
+
 </body>
 </html>

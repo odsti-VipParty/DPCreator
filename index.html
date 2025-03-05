@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>विकासशील इंसान पार्टी - DP Generator</title>
+    <title>VIP DP Generator</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -34,13 +34,13 @@
 </head>
 <body>
 
-    <h2>विकासशील इंसान पार्टी - DP Generator</h2>
+    <h2>VIP DP Generator</h2>
     <div class="container">
         <input type="file" id="imageUpload" accept="image/*">
         <br>
         <canvas id="dpCanvas" width="500" height="500"></canvas>
         <br>
-        <button class="download-btn" id="downloadBtn">Download DP</button>
+        <button class="download-btn" id="downloadBtn" disabled>Download DP</button>
     </div>
 
     <script>
@@ -48,10 +48,12 @@
         const ctx = canvas.getContext("2d");
 
         const frame = new Image();
-        frame.crossOrigin = "anonymous";  // Prevent CORS issues
+        frame.crossOrigin = "anonymous";  // Fixes CORS issue
         frame.src = "https://raw.githubusercontent.com/odsti-VipParty/DPCreator/main/DP.png";
 
         let userImage = new Image();
+        let imageLoaded = false;
+        let frameLoaded = false;
 
         document.getElementById("imageUpload").addEventListener("change", function(event) {
             const file = event.target.files[0];
@@ -65,33 +67,38 @@
         });
 
         userImage.onload = function() {
+            imageLoaded = true;
             drawCanvas();
         };
 
         frame.onload = function() {
+            frameLoaded = true;
             drawCanvas();
         };
 
         function drawCanvas() {
+            if (!imageLoaded || !frameLoaded) return;
+
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             // Draw circular user image
-            if (userImage.src) {
-                const imgSize = 360;  // Adjust for better fit
-                const imgX = (canvas.width - imgSize) / 2;
-                const imgY = (canvas.height - imgSize) / 2;
-                
-                ctx.save();
-                ctx.beginPath();
-                ctx.arc(canvas.width / 2, canvas.height / 2, imgSize / 2, 0, Math.PI * 2);
-                ctx.closePath();
-                ctx.clip();
-                ctx.drawImage(userImage, imgX, imgY, imgSize, imgSize);
-                ctx.restore();
-            }
+            const imgSize = 360;  // Adjusted for better fit
+            const imgX = (canvas.width - imgSize) / 2;
+            const imgY = (canvas.height - imgSize) / 2;
+            
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(canvas.width / 2, canvas.height / 2, imgSize / 2, 0, Math.PI * 2);
+            ctx.closePath();
+            ctx.clip();
+            ctx.drawImage(userImage, imgX, imgY, imgSize, imgSize);
+            ctx.restore();
 
             // Draw frame on top
             ctx.drawImage(frame, 0, 0, canvas.width, canvas.height);
+
+            // Enable download button
+            document.getElementById("downloadBtn").disabled = false;
         }
 
         document.getElementById("downloadBtn").addEventListener("click", function() {

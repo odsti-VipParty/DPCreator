@@ -6,87 +6,84 @@
     <title>VIP DP Generator</title>
     <style>
         body {
-            text-align: center;
             font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
         }
         canvas {
             display: block;
             margin: 20px auto;
-            border-radius: 50%;
-        }
-        .container {
-            position: relative;
-            width: 300px;
-            margin: auto;
+            border-radius: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
         input {
-            margin-top: 10px;
+            margin: 10px;
+            padding: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #218838;
         }
     </style>
 </head>
 <body>
-
     <h2>VIP DP Generator</h2>
-    <input type="file" id="upload" accept="image/*">
-    <br>
+    <input type="file" id="uploadImage" accept="image/*">
+    <canvas id="canvas" width="500" height="500"></canvas>
     <button onclick="downloadDP()">Download DP</button>
 
-    <div class="container">
-        <canvas id="dpCanvas" width="300" height="300"></canvas>
-    </div>
-
     <script>
-        let uploadedImage = null;
-        const frameURL = "YOUR_FRAME_IMAGE_URL_HERE"; // Replace this with the correct frame image URL
-
-        const canvas = document.getElementById("dpCanvas");
+        const canvas = document.getElementById("canvas");
         const ctx = canvas.getContext("2d");
+        const frameURL = "https://raw.githubusercontent.com/odsti-VipParty/DPcreator/main/DP.png"; // Change if needed
+        let userImage = null;
 
-        document.getElementById("upload").addEventListener("change", function(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
+        document.getElementById("uploadImage").addEventListener("change", function(event) {
             const reader = new FileReader();
             reader.onload = function(e) {
-                const img = new Image();
-                img.onload = function() {
-                    uploadedImage = img;
+                userImage = new Image();
+                userImage.onload = function() {
                     drawDP();
                 };
-                img.src = e.target.result;
+                userImage.src = e.target.result;
             };
-            reader.readAsDataURL(file);
+            reader.readAsDataURL(event.target.files[0]);
         });
 
         function drawDP() {
-            if (!uploadedImage) return;
-            
-            const frame = new Image();
-            frame.src = frameURL;
-            frame.onload = function() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-                // Draw user image
+            if (userImage) {
                 ctx.save();
                 ctx.beginPath();
-                ctx.arc(150, 150, 140, 0, Math.PI * 2);
+                ctx.arc(250, 250, 200, 0, Math.PI * 2, true);
                 ctx.closePath();
                 ctx.clip();
-                ctx.drawImage(uploadedImage, 30, 30, 240, 240);
+                ctx.drawImage(userImage, 50, 50, 400, 400);
                 ctx.restore();
+            }
 
-                // Draw frame
-                ctx.drawImage(frame, 0, 0, 300, 300);
+            const frame = new Image();
+            frame.onload = function() {
+                ctx.drawImage(frame, 0, 0, 500, 500);
             };
+            frame.src = frameURL;
         }
 
         function downloadDP() {
             const link = document.createElement("a");
-            link.download = "VIP-DP.png";
+            link.download = "VIP_DP.png";
             link.href = canvas.toDataURL("image/png");
             link.click();
         }
     </script>
-
 </body>
 </html>

@@ -17,7 +17,6 @@
             border-radius: 10px;
             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
             background: white;
-            cursor: grab;
             max-width: 90%;
         }
         input, button {
@@ -42,12 +41,13 @@
     <h2>VIP DP Generator</h2>
     <div class="container">
         <input type="file" id="imageUpload" accept="image/*">
+        <button id="cameraBtn">📷 Take Photo</button>
         <br>
         <canvas id="dpCanvas" width="500" height="500"></canvas>
         <br>
         <div class="controls">
             <label>Zoom:</label>
-            <input type="range" id="zoomSlider" min="0.5" max="2" step="0.01" value="1">
+            <input type="range" id="zoomSlider" min="1" max="2" step="0.01" value="1">
         </div>
         <button class="download-btn" id="downloadBtn" disabled>Download DP</button>
     </div>
@@ -63,10 +63,11 @@
         let userImage = new Image();
         let imageLoaded = false, frameLoaded = false;
         
-        let imgX = 170, imgY = 170;  
+        let imgX = 0, imgY = 0;  
         let scale = 1; 
         let dragging = false;
         let startX, startY;
+        let imgWidth, imgHeight;
 
         document.getElementById("imageUpload").addEventListener("change", function(event) {
             const file = event.target.files[0];
@@ -79,8 +80,28 @@
             }
         });
 
+        // Open Camera
+        document.getElementById("cameraBtn").addEventListener("click", function() {
+            const input = document.createElement("input");
+            input.type = "file";
+            input.accept = "image/*";
+            input.capture = "environment"; // Opens the camera
+            input.addEventListener("change", function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        userImage.src = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+            input.click();
+        });
+
         userImage.onload = function() {
             imageLoaded = true;
+            adjustImageSize();
             drawCanvas();
         };
 
@@ -89,10 +110,31 @@
             drawCanvas();
         };
 
+        function adjustImageSize() {
+            const aspectRatio = userImage.width / userImage.height;
+            const canvasSize = 500;
+            const circleRadius = 160; 
+
+            if (aspectRatio > 1) { 
+                imgWidth = 2 * circleRadius;
+                imgHeight = imgWidth / aspectRatio;
+            } else { 
+                imgHeight = 2 * circleRadius;
+                imgWidth = imgHeight * aspectRatio;
+            }
+
+            imgX = (canvasSize - imgWidth) / 2;
+            imgY = (canvasSize - imgHeight) / 2;
+        }
+
         function drawCanvas() {
             if (!imageLoaded || !frameLoaded) return;
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // White background to avoid transparency
+            ctx.fillStyle = "white";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             const centerX = canvas.width / 2;
             const centerY = canvas.height / 2;
@@ -104,8 +146,7 @@
             ctx.closePath();
             ctx.clip();
 
-            const imgSize = 2 * circleRadius * scale; 
-            ctx.drawImage(userImage, imgX, imgY, imgSize, imgSize);
+            ctx.drawImage(userImage, imgX, imgY, imgWidth * scale, imgHeight * scale);
             ctx.restore();
 
             ctx.drawImage(frame, 0, 0, canvas.width, canvas.height);

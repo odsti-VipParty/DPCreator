@@ -67,6 +67,7 @@
         let dragging = false;
         let startX, startY;
         let imgWidth, imgHeight;
+        const circleRadius = 275; // Adjusted to match the frame exactly
 
         document.getElementById("imageUpload").addEventListener("change", function(event) {
             const file = event.target.files[0];
@@ -112,7 +113,6 @@
         function adjustImageSize() {
             const aspectRatio = userImage.width / userImage.height;
             const canvasSize = 800;
-            const circleRadius = 300; 
 
             if (aspectRatio > 1) { 
                 imgWidth = 2 * circleRadius;
@@ -136,7 +136,6 @@
 
             const centerX = canvas.width / 2;
             const centerY = canvas.height / 2;
-            const circleRadius = 300;  
 
             ctx.save();
             ctx.beginPath();

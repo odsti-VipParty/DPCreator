@@ -3,33 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>विकासशील इंसान पार्टी (VIP) DP Generator</title>
+    <title>विकासशील इंसान पार्टी(VIP Party) DP Generator</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             text-align: center;
-            background-color: #f0f8ff;
-            margin: 0;
-            padding: 0;
+            background-color: #FFFFFF;
         }
         .container {
             margin-top: 20px;
         }
         canvas {
             border-radius: 10px;
-            background: white;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            background: blue;
             max-width: 100%;
         }
         input, button {
             margin: 10px;
-            padding: 10px;
-            font-size: 16px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
         }
         .download-btn {
-            background-color: #28a745;
+            background-color: green;
             color: white;
             border: none;
             padding: 10px 20px;
@@ -37,17 +30,14 @@
             border-radius: 5px;
             font-size: 16px;
         }
-        .download-btn:disabled {
-            background-color: #6c757d;
-            cursor: not-allowed;
-        }
         .controls {
             margin-top: 10px;
         }
     </style>
 </head>
 <body>
-    <h1>विकासशील इंसान पार्टी (VIP) DP Generator</h1>
+
+    <h1>विकासशील इंसान पार्टी(VIP Party) DP Generator</h1>
     <div class="container">
         <input type="file" id="imageUpload" accept="image/*">
         <button id="cameraBtn">📷 Take Photo [सेल्फी]</button>
@@ -64,7 +54,7 @@
     <script>
         const canvas = document.getElementById("dpCanvas");
         const ctx = canvas.getContext("2d");
-        
+
         const frame = new Image();
         frame.crossOrigin = "anonymous"; 
         frame.src = "https://raw.githubusercontent.com/odsti-VipParty/DPCreator/main/DP_v002.png";
@@ -77,7 +67,7 @@
         let dragging = false;
         let startX, startY;
         let imgWidth, imgHeight;
-        const circleRadius = 250;
+        const circleRadius = 250; // Adjusted to match the frame exactly
 
         document.getElementById("imageUpload").addEventListener("change", function(event) {
             const file = event.target.files[0];
@@ -90,6 +80,7 @@
             }
         });
 
+        // Open Camera
         document.getElementById("cameraBtn").addEventListener("click", function() {
             const input = document.createElement("input");
             input.type = "file";
@@ -139,22 +130,24 @@
             if (!imageLoaded || !frameLoaded) return;
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+
             ctx.fillStyle = "white";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
+
             const centerX = canvas.width / 2;
             const centerY = canvas.height / 2;
-            
+
             ctx.save();
             ctx.beginPath();
             ctx.arc(centerX, centerY, circleRadius, 0, Math.PI * 2);
             ctx.closePath();
             ctx.clip();
-            
+
             ctx.drawImage(userImage, imgX, imgY, imgWidth * scale, imgHeight * scale);
             ctx.restore();
+
             ctx.drawImage(frame, 0, 0, canvas.width, canvas.height);
-            
+
             document.getElementById("downloadBtn").disabled = false;
         }
 
@@ -178,13 +171,35 @@
 
         canvas.addEventListener("mouseup", () => dragging = false);
         canvas.addEventListener("mouseleave", () => dragging = false);
-        
+
+        canvas.addEventListener("touchstart", (e) => {
+            dragging = true;
+            const touch = e.touches[0];
+            const rect = canvas.getBoundingClientRect();
+            startX = touch.clientX - rect.left - imgX;
+            startY = touch.clientY - rect.top - imgY;
+        });
+
+        canvas.addEventListener("touchmove", (e) => {
+            if (!dragging) return;
+            const touch = e.touches[0];
+            const rect = canvas.getBoundingClientRect();
+            imgX = touch.clientX - rect.left - startX;
+            imgY = touch.clientY - rect.top - startY;
+            drawCanvas();
+        });
+
+        canvas.addEventListener("touchend", () => dragging = false);
+        canvas.addEventListener("touchcancel", () => dragging = false);
+
         document.getElementById("downloadBtn").addEventListener("click", function() {
             const link = document.createElement("a");
             link.download = "VIP_DP.png";
             link.href = canvas.toDataURL("image/png");
             link.click();
         });
+
     </script>
+
 </body>
 </html>

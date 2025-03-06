@@ -15,9 +15,8 @@
         }
         canvas {
             border-radius: 10px;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
             background: white;
-            max-width: 90%;
+            max-width: 100%;
         }
         input, button {
             margin: 10px;
@@ -43,11 +42,11 @@
         <input type="file" id="imageUpload" accept="image/*">
         <button id="cameraBtn">📷 Take Photo</button>
         <br>
-        <canvas id="dpCanvas" width="500" height="500"></canvas>
+        <canvas id="dpCanvas" width="800" height="800"></canvas>
         <br>
         <div class="controls">
             <label>Zoom:</label>
-            <input type="range" id="zoomSlider" min="1" max="2" step="0.01" value="1">
+            <input type="range" id="zoomSlider" min="1" max="3" step="0.01" value="1">
         </div>
         <button class="download-btn" id="downloadBtn" disabled>Download DP</button>
     </div>
@@ -85,7 +84,7 @@
             const input = document.createElement("input");
             input.type = "file";
             input.accept = "image/*";
-            input.capture = "environment"; // Opens the camera
+            input.capture = "environment";
             input.addEventListener("change", function(event) {
                 const file = event.target.files[0];
                 if (file) {
@@ -112,8 +111,8 @@
 
         function adjustImageSize() {
             const aspectRatio = userImage.width / userImage.height;
-            const canvasSize = 500;
-            const circleRadius = 160; 
+            const canvasSize = 800;
+            const circleRadius = 300; 
 
             if (aspectRatio > 1) { 
                 imgWidth = 2 * circleRadius;
@@ -132,13 +131,12 @@
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // White background to avoid transparency
             ctx.fillStyle = "white";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             const centerX = canvas.width / 2;
             const centerY = canvas.height / 2;
-            const circleRadius = 160;  
+            const circleRadius = 300;  
 
             ctx.save();
             ctx.beginPath();
@@ -154,13 +152,11 @@
             document.getElementById("downloadBtn").disabled = false;
         }
 
-        // Zoom control
         document.getElementById("zoomSlider").addEventListener("input", function() {
             scale = parseFloat(this.value);
             drawCanvas();
         });
 
-        // Mouse events for dragging
         canvas.addEventListener("mousedown", (e) => {
             dragging = true;
             startX = e.offsetX - imgX;
@@ -177,7 +173,6 @@
         canvas.addEventListener("mouseup", () => dragging = false);
         canvas.addEventListener("mouseleave", () => dragging = false);
 
-        // Mobile touch events for dragging
         canvas.addEventListener("touchstart", (e) => {
             dragging = true;
             const touch = e.touches[0];
@@ -198,7 +193,6 @@
         canvas.addEventListener("touchend", () => dragging = false);
         canvas.addEventListener("touchcancel", () => dragging = false);
 
-        // Download functionality
         document.getElementById("downloadBtn").addEventListener("click", function() {
             const link = document.createElement("a");
             link.download = "VIP_DP.png";

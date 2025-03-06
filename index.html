@@ -18,6 +18,7 @@
             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
             background: white;
             cursor: grab;
+            max-width: 90%;
         }
         input, button {
             margin: 10px;
@@ -62,8 +63,8 @@
         let userImage = new Image();
         let imageLoaded = false, frameLoaded = false;
         
-        let imgX = 170, imgY = 170;  // Adjusted initial position
-        let scale = 1; // Initial zoom
+        let imgX = 170, imgY = 170;  
+        let scale = 1; 
         let dragging = false;
         let startX, startY;
 
@@ -93,10 +94,9 @@
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Circular user image (matching the frame)
             const centerX = canvas.width / 2;
             const centerY = canvas.height / 2;
-            const circleRadius = 160;  // Adjusted to match frame's cutout
+            const circleRadius = 160;  
 
             ctx.save();
             ctx.beginPath();
@@ -104,11 +104,10 @@
             ctx.closePath();
             ctx.clip();
 
-            const imgSize = 2 * circleRadius * scale; // Adjusted size
+            const imgSize = 2 * circleRadius * scale; 
             ctx.drawImage(userImage, imgX, imgY, imgSize, imgSize);
             ctx.restore();
 
-            // Draw frame on top
             ctx.drawImage(frame, 0, 0, canvas.width, canvas.height);
 
             document.getElementById("downloadBtn").disabled = false;
@@ -120,7 +119,7 @@
             drawCanvas();
         });
 
-        // Dragging functionality
+        // Mouse events for dragging
         canvas.addEventListener("mousedown", (e) => {
             dragging = true;
             startX = e.offsetX - imgX;
@@ -136,6 +135,27 @@
 
         canvas.addEventListener("mouseup", () => dragging = false);
         canvas.addEventListener("mouseleave", () => dragging = false);
+
+        // Mobile touch events for dragging
+        canvas.addEventListener("touchstart", (e) => {
+            dragging = true;
+            const touch = e.touches[0];
+            const rect = canvas.getBoundingClientRect();
+            startX = touch.clientX - rect.left - imgX;
+            startY = touch.clientY - rect.top - imgY;
+        });
+
+        canvas.addEventListener("touchmove", (e) => {
+            if (!dragging) return;
+            const touch = e.touches[0];
+            const rect = canvas.getBoundingClientRect();
+            imgX = touch.clientX - rect.left - startX;
+            imgY = touch.clientY - rect.top - startY;
+            drawCanvas();
+        });
+
+        canvas.addEventListener("touchend", () => dragging = false);
+        canvas.addEventListener("touchcancel", () => dragging = false);
 
         // Download functionality
         document.getElementById("downloadBtn").addEventListener("click", function() {
